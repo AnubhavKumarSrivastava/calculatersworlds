@@ -1,0 +1,1 @@
+export default function ResultCard({label,value}:{label:string;value:string}){return <div className="result rounded-2xl border border-cyan-400/15 bg-gradient-to-br from-cyan-400/[.08] to-violet-500/[.03] p-5"><p className="text-xs font-bold uppercase tracking-[.16em] text-slate-500">{label}</p><p className="mt-2 break-words text-2xl font-black md:text-3xl">{value}</p></div>}

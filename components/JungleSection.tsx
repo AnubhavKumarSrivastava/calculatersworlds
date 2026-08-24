@@ -1,0 +1,1 @@
+export default function JungleSection({children,className=""}:{children:React.ReactNode;className?:string}){return <section className={`jungle-section ${className}`}><div className="section-leaf leaf-l">🍃</div><div className="section-leaf leaf-r">🍃</div>{children}<div className="roots">〰〰〰〰〰〰〰〰〰</div></section>}
