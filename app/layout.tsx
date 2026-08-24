@@ -19,8 +19,8 @@ export const metadata: Metadata = {
     "A jungle-themed India-focused collection of calculators, developer utilities, SEO tools and file tools.",
 
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 };
 
