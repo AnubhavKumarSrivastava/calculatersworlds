@@ -53,3 +53,33 @@ Replace https://www.calcindia.example in sitemap/metadata with the production do
 
 ## URL architecture
 All tools use /calculators, /finance, /dev, /seo and /files canonical routes. Legacy developer/file-tools routes redirect permanently. Pages use static generation/revalidation and cache headers. Set NEXT_PUBLIC_SITE_URL to the real production domain.
+
+
+## UI update — professional light theme
+
+The Jungle visual system has been removed from the active UI. The site now uses a clean, serious, light interface intended for financial planning, calculators, developer utilities, SEO and file tools.
+
+### Page-specific visual symbols
+
+- Calculators / EMI / SIP / GST / tax: 🧮 calculator symbol
+- Finance: 💰 financial symbol
+- Developer tools / developer time utilities: `</>` code symbol
+- SEO: ⌕ search/optimization symbol
+- PDF and image conversion: 📄 file/document symbol
+
+### File conversion loader
+
+Image conversion pages now show a visible processing loader with a minimum 3-second processing window. After processing, the converted file is presented with a download action.
+
+Supported conversion routes include:
+
+- `/files/jpg-to-png`
+- `/files/png-to-jpg`
+- `/files/jpg-to-pdf`
+- `/files/image-compressor`
+- `/files/image-resizer`
+- `/files/webp-converter`
+
+### Home page routing
+
+Home-page tool cards now use the central `categoryPath()` helper, so every card points to its correct category route instead of attempting an incorrect root-level slug.

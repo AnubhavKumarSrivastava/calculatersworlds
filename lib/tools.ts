@@ -494,17 +494,17 @@ const toolDefinitions: Record<string, Omit<Tool, "slug">> = {
   "jpg-to-png": make(
     "JPG → PNG",
     "Convert JPG images to PNG.",
-    "image-convert",
+    "jpg-to-png",
     4,
     "files",
-    "The source image is decoded and exported as PNG.",
+    "The source JPG image is decoded and exported as PNG.",
     "Convert JPG images to PNG format.",
   ),
 
   "png-to-jpg": make(
     "PNG → JPG",
     "Convert PNG images to JPG.",
-    "image-convert",
+    "png-to-jpg",
     4,
     "files",
     "The source image is decoded and exported as JPEG.",
