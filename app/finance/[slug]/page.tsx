@@ -9,7 +9,7 @@ import {
 
 import ToolShell from "@/components/ToolShell";
 import ToolContent from "@/components/ToolContent";
-import SpecialEngine from "@/components/SpecialEngine";
+import CalculatorEngine from "@/components/CalculatorEngine";
 
 export const revalidate = 3600;
 
@@ -72,7 +72,7 @@ export default async function FinanceToolPage({
         description={tool.description}
         category={CATEGORY}
       >
-        <SpecialEngine kind={tool.kind} />
+        <CalculatorEngine kind={tool.kind} />
       </ToolShell>
 
       <ToolContent

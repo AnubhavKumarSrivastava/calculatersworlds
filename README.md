@@ -55,31 +55,15 @@ Replace https://www.calcindia.example in sitemap/metadata with the production do
 All tools use /calculators, /finance, /dev, /seo and /files canonical routes. Legacy developer/file-tools routes redirect permanently. Pages use static generation/revalidation and cache headers. Set NEXT_PUBLIC_SITE_URL to the real production domain.
 
 
-## UI update — professional light theme
+## Functional fixes in this release
 
-The Jungle visual system has been removed from the active UI. The site now uses a clean, serious, light interface intended for financial planning, calculators, developer utilities, SEO and file tools.
+- Finance detail routes now use the real calculator engine instead of the developer/password engine.
+- Developer detail routes use a dedicated engine that supports JSON, Base64, URL, UUID, password, QR, HTML, CSS, JS, regex, timestamp and related tools.
+- File conversion/processing shows a minimum 3-second processing indicator before downloads are triggered.
+- Resume Builder is routed to its own editor.
+- Home tool cards use category-aware URLs such as `/finance/fd-calculator`, `/dev/json-formatter`, `/files/jpg-to-png`, etc.
+- TypeScript configuration no longer includes `.next/dev/types/**/*.ts`, preventing stale development validator files from breaking production builds.
 
-### Page-specific visual symbols
+### Build verification
 
-- Calculators / EMI / SIP / GST / tax: 🧮 calculator symbol
-- Finance: 💰 financial symbol
-- Developer tools / developer time utilities: `</>` code symbol
-- SEO: ⌕ search/optimization symbol
-- PDF and image conversion: 📄 file/document symbol
-
-### File conversion loader
-
-Image conversion pages now show a visible processing loader with a minimum 3-second processing window. After processing, the converted file is presented with a download action.
-
-Supported conversion routes include:
-
-- `/files/jpg-to-png`
-- `/files/png-to-jpg`
-- `/files/jpg-to-pdf`
-- `/files/image-compressor`
-- `/files/image-resizer`
-- `/files/webp-converter`
-
-### Home page routing
-
-Home-page tool cards now use the central `categoryPath()` helper, so every card points to its correct category route instead of attempting an incorrect root-level slug.
+A TypeScript/TSX syntax transpile pass was completed on the source. A full `next build` could not be executed in the packaging environment because dependency installation repeatedly timed out. On a machine with network access, run `npm install` followed by `npm run build`.
