@@ -26,7 +26,7 @@ export default async function FileToolPage({ params }: { params: Promise<{ slug:
   if (!tool || tool.category !== CATEGORY) notFound();
   return <>
     <ToolShell title={tool.title} description={tool.description} category={CATEGORY}>
-      {tool.kind === "resume" ? <ResumeBuilder /> : <FileEngine kind={tool.kind} />}
+      {tool.kind === "resume" ? <ResumeBuilder /> : <FileEngine kind={tool.kind} slug={slug} />}
     </ToolShell>
     <ToolContent slug={slug} tool={tool} />
   </>;

@@ -3,26 +3,23 @@
 import { useState } from "react";
 import { PDFDocument } from "pdf-lib";
 
-type Props = { kind: string };
+type Props = { kind: string; slug?: string };
+type OutputFile = { blob: Blob; filename: string; url: string };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export default function FileEngine({ kind }: Props) {
+export default function FileEngine({ kind, slug }: Props) {
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
+  const [outputs, setOutputs] = useState<OutputFile[]>([]);
 
-
-  const download = (blob: Blob, filename: string) => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const clearOutputs = () => {
+    setOutputs((current) => {
+      current.forEach((item) => URL.revokeObjectURL(item.url));
+      return [];
+    });
   };
 
   const pdfBlob = (bytes: Uint8Array<ArrayBufferLike>) => {
@@ -31,44 +28,81 @@ export default function FileEngine({ kind }: Props) {
     return new Blob([buffer], { type: "application/pdf" });
   };
 
-  const imageToBlob = (file: File, output: "png" | "jpeg" | "webp", maxWidth?: number) => new Promise<Blob>((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      try {
-        const width = maxWidth ? Math.min(maxWidth, img.width) : img.width;
-        const height = Math.max(1, Math.round(img.height * (width / img.width)));
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) throw new Error("Browser image canvas is unavailable.");
-        if (output === "jpeg") {
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, width, height);
+  const imageToBlob = (
+    file: File,
+    output: "png" | "jpeg" | "webp",
+    maxWidth?: number,
+  ) =>
+    new Promise<Blob>((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        try {
+          const width = maxWidth ? Math.min(maxWidth, img.width) : img.width;
+          const height = Math.max(1, Math.round(img.height * (width / img.width)));
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) throw new Error("Browser image canvas is unavailable.");
+          if (output === "jpeg") {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, width, height);
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => (blob ? resolve(blob) : reject(new Error("Could not create output image."))),
+            `image/${output}`,
+            output === "webp" ? 0.82 : 0.9,
+          );
+        } catch (error) {
+          reject(error);
+        } finally {
+          URL.revokeObjectURL(url);
         }
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Could not create output image.")), `image/${output}`, output === "webp" ? 0.82 : 0.9);
-      } catch (e) { reject(e); } finally { URL.revokeObjectURL(url); }
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Unable to read the selected image.")); };
-    img.src = url;
-  });
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Unable to read the selected image."));
+      };
+      img.src = url;
+    });
 
   const processFiles = async () => {
-    if (!files.length) { setMessage("Choose a file first."); return; }
+    if (!files.length) {
+      setMessage("Choose a file first.");
+      return;
+    }
     if (busy) return;
+
+    clearOutputs();
     const started = Date.now();
-    setBusy(true); setProgress(8); setMessage("Preparing your file...");
+    setBusy(true);
+    setProgress(8);
+    setMessage("Preparing your file...");
+
     try {
       const pending: Array<{ blob: Blob; filename: string }> = [];
-      if (kind.startsWith("image")) {
+
+      if (kind.startsWith("image") || slug === "jpg-to-png" || slug === "png-to-jpg") {
         const file = files[0];
-        const output = kind === "image-webp" ? "webp" : kind === "png-to-jpg" ? "jpeg" : kind === "jpg-to-png" ? "png" : file.type === "image/png" ? "jpeg" : "webp";
-        setProgress(35); setMessage("Reading image...");
+        const output = slug === "jpg-to-png"
+          ? "png"
+          : slug === "png-to-jpg"
+            ? "jpeg"
+            : kind === "image-webp"
+              ? "webp"
+              : file.type === "image/png" ? "jpeg" : "webp";
+
+        setProgress(35);
+        setMessage("Reading image...");
         const blob = await imageToBlob(file, output, kind === "image-resize" ? 1200 : undefined);
-        setProgress(72); setMessage("Optimizing output...");
-        pending.push({ blob, filename: `${file.name.replace(/\.[^.]+$/, "")}.${output === "jpeg" ? "jpg" : output}` });
+        setProgress(72);
+        setMessage("Preparing your converted file...");
+        pending.push({
+          blob,
+          filename: `${file.name.replace(/\.[^.]+$/, "")}.${output === "jpeg" ? "jpg" : output}`,
+        });
       } else if (kind === "pdf-merge") {
         const out = await PDFDocument.create();
         for (const file of files) {
@@ -76,7 +110,8 @@ export default function FileEngine({ kind }: Props) {
           const pages = await out.copyPages(src, src.getPageIndices());
           pages.forEach((page) => out.addPage(page));
         }
-        setProgress(75); pending.push({ blob: pdfBlob(await out.save()), filename: "merged.pdf" });
+        setProgress(75);
+        pending.push({ blob: pdfBlob(await out.save()), filename: "merged.pdf" });
       } else if (kind === "pdf-split") {
         const src = await PDFDocument.load(await files[0].arrayBuffer());
         for (let i = 0; i < src.getPageCount(); i++) {
@@ -88,7 +123,8 @@ export default function FileEngine({ kind }: Props) {
         setProgress(78);
       } else if (kind === "pdf-compress") {
         const src = await PDFDocument.load(await files[0].arrayBuffer());
-        setProgress(70); pending.push({ blob: pdfBlob(await src.save({ useObjectStreams: true })), filename: "compressed.pdf" });
+        setProgress(70);
+        pending.push({ blob: pdfBlob(await src.save({ useObjectStreams: true })), filename: "compressed.pdf" });
       } else if (kind === "jpg-pdf") {
         const out = await PDFDocument.create();
         for (const file of files) {
@@ -96,19 +132,25 @@ export default function FileEngine({ kind }: Props) {
           const page = out.addPage([img.width, img.height]);
           page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
         }
-        setProgress(75); pending.push({ blob: pdfBlob(await out.save()), filename: "images.pdf" });
+        setProgress(75);
+        pending.push({ blob: pdfBlob(await out.save()), filename: "images.pdf" });
       } else if (kind === "pdf-jpg") {
-        setMessage("PDF → JPG requires a browser PDF renderer. This project keeps the conversion page ready, but the current dependency set does not include a PDF rasterizer.");
-        setProgress(50);
+        throw new Error("PDF → JPG requires a browser PDF renderer. This converter is not enabled in the current dependency set.");
       } else {
-        setMessage("This file operation is not available yet.");
+        throw new Error("This file operation is not available yet.");
       }
 
       const remaining = Math.max(0, 3000 - (Date.now() - started));
       if (remaining) await sleep(remaining);
-      pending.forEach(({ blob, filename }) => download(blob, filename));
+
+      const prepared = pending.map((item) => ({
+        ...item,
+        url: URL.createObjectURL(item.blob),
+      }));
+
+      setOutputs(prepared);
       setProgress(100);
-      setMessage(pending.length ? "✓ File processed successfully. Your download is ready." : "✓ Processing completed.");
+      setMessage("✓ File processed successfully. Your file is ready. Click Download to save it.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "File processing failed.");
       setProgress(0);
@@ -118,13 +160,80 @@ export default function FileEngine({ kind }: Props) {
   };
 
   const isMultiple = kind === "pdf-merge" || kind === "jpg-pdf";
-  const accept = kind === "jpg-pdf" ? ".jpg,.jpeg" : kind === "pdf-merge" || kind.startsWith("pdf-") ? "application/pdf" : "image/*";
+  const accept = kind === "jpg-pdf"
+    ? ".jpg,.jpeg"
+    : kind === "pdf-merge" || kind.startsWith("pdf-")
+      ? "application/pdf"
+      : "image/*";
 
-  return <div className="space-y-5">
-    <input type="file" multiple={isMultiple} accept={accept} disabled={busy} onChange={(e) => { setFiles(Array.from(e.target.files || [])); setMessage(""); setProgress(0); }} className="block w-full rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-sm text-slate-600" />
-    {files.length > 0 && <p className="text-sm text-slate-500">{files.length} file{files.length === 1 ? "" : "s"} selected.</p>}
-    <button type="button" disabled={busy} onClick={processFiles} className="rounded-2xl bg-blue-600 px-5 py-3 font-black text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">{busy ? "Processing..." : "Process files"}</button>
-    {busy && <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5"><div className="mb-3 flex justify-between text-sm font-bold text-blue-800"><span>Processing your file</span><span>{progress}%</span></div><div className="h-3 overflow-hidden rounded-full bg-blue-100"><div className="h-full rounded-full bg-blue-600 transition-all duration-300" style={{ width: `${progress}%` }} /></div><p className="mt-3 text-xs text-blue-700">Please wait. The processing indicator runs for at least 3 seconds.</p></div>}
-    {message && <p className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">{message}</p>}
-  </div>;
+  const downloadOne = (item: OutputFile) => {
+    const a = document.createElement("a");
+    a.href = item.url;
+    a.download = item.filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  const downloadAll = () => outputs.forEach(downloadOne);
+
+  return (
+    <div className="file-engine">
+      <input
+        type="file"
+        multiple={isMultiple}
+        accept={accept}
+        disabled={busy}
+        onChange={(event) => {
+          clearOutputs();
+          setFiles(Array.from(event.target.files || []));
+          setMessage("");
+          setProgress(0);
+        }}
+        className="file-picker"
+      />
+
+      {files.length > 0 && (
+        <p className="file-selected">{files.length} file{files.length === 1 ? "" : "s"} selected.</p>
+      )}
+
+      <button type="button" disabled={busy} onClick={processFiles} className="file-primary-button">
+        {busy ? "Processing..." : "Process file"}
+      </button>
+
+      {busy && (
+        <div className="file-progress-box">
+          <div className="file-progress-head"><span>Processing your file</span><span>{progress}%</span></div>
+          <div className="file-progress-track"><div className="file-progress-bar" style={{ width: `${progress}%` }} /></div>
+          <p>Please wait. Processing takes at least 3 seconds.</p>
+        </div>
+      )}
+
+      {message && <p className="file-message">{message}</p>}
+
+      {outputs.length > 0 && (
+        <div className="file-output-box">
+          <div>
+            <span className="file-success-badge">✓ READY</span>
+            <h3>Your converted file is ready</h3>
+            <p>The file will not download automatically. Choose Download when you are ready.</p>
+          </div>
+
+          <div className="file-output-list">
+            {outputs.map((item) => (
+              <div className="file-output-item" key={item.filename + item.url}>
+                <span className="file-output-icon">{item.filename.toLowerCase().endsWith(".pdf") ? "📄" : "🖼"}</span>
+                <strong>{item.filename}</strong>
+                <button type="button" onClick={() => downloadOne(item)} className="file-download-button">Download</button>
+              </div>
+            ))}
+          </div>
+
+          {outputs.length > 1 && (
+            <button type="button" onClick={downloadAll} className="file-download-all">Download all files</button>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }

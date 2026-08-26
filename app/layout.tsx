@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    "A jungle-themed India-focused collection of calculators, developer utilities, SEO tools and file tools.",
+    "Practical calculators, finance planning tools, developer utilities, SEO tools and browser-based file processing.",
 
   robots: {
     index: false,
@@ -34,7 +34,7 @@ export default function RootLayout({
       <body>
         <SiteHeader />
 
-        <main>{children}</main>
+        <div>{children}</div>
 
         <SiteFooter />
 
