@@ -20,7 +20,7 @@ export default function SiteFooter() {
             <p style={{ marginTop: 18, maxWidth: 360, lineHeight: 1.8, fontSize: 14 }}>
               Practical calculators, finance planning tools, developer utilities, SEO tools and browser-based file processing.
             </p>
-            <Link href="/calculators" className="header-cta" style={{ margin: "18px 0 0", display: "inline-flex" }}>
+            <Link href="/calculators" className="header-cta !text-white" style={{ margin: "18px 0 0", display: "inline-flex" }}>
               Explore Tools →
             </Link>
           </div>
