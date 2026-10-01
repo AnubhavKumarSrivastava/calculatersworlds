@@ -49,7 +49,7 @@ File pages use PDF/image/upload symbols.
 npm install
 npm run dev
 
-Replace https://www.calcindia.example in sitemap/metadata with the production domain.
+Replace https://thetoolsmate.com/ in sitemap/metadata with the production domain.
 
 ## URL architecture
 All tools use /calculators, /finance, /dev, /seo and /files canonical routes. Legacy developer/file-tools routes redirect permanently. Pages use static generation/revalidation and cache headers. Set NEXT_PUBLIC_SITE_URL to the real production domain.

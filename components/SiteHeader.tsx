@@ -80,8 +80,7 @@ export default function SiteHeader() {
     <header className="site-header" onMouseLeave={() => setActiveMenu(null)}>
       <div className="site-header-inner">
         <Link href="/" className="site-logo" onClick={() => setMobileOpen(false)}>
-          <span className="site-logo-mark">CI</span>
-          <span className="site-logo-text">Calc<span>India</span></span>
+          <img src="/logo.png" alt="thetoolsmate Logo" width="112" height="32" />
         </Link>
 
         <nav className="desktop-nav" aria-label="Primary navigation">

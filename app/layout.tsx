@@ -7,7 +7,7 @@ import WhatsAppFloat from "@/components/WhatsAppFloat";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://www.calcindia.example"
+    process.env.NEXT_PUBLIC_SITE_URL || "https://thetoolsmate.com/"
   ),
 
   title: {
