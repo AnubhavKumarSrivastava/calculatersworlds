@@ -14,8 +14,7 @@ export default function SiteFooter() {
         <div className="site-footer-grid">
           <div>
             <Link href="/" className="site-logo">
-              <span className="site-logo-mark">CI</span>
-              <span className="site-logo-text">Calc<span>India</span></span>
+               <img src="/logo.png" alt="thetoolsmate Logo" width="112" height="32" />
             </Link>
             <p style={{ marginTop: 18, maxWidth: 360, lineHeight: 1.8, fontSize: 14 }}>
               Practical calculators, finance planning tools, developer utilities, SEO tools and browser-based file processing.
