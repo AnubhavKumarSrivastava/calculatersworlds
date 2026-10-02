@@ -102,7 +102,7 @@ export default function SiteHeader() {
               <div className={`nav-dropdown ${activeMenu === name ? "is-open" : ""}`}>
                 <div className="nav-dropdown-title">
                   <div>
-                    <span className="nav-dropdown-kicker">CALCINDIA</span>
+                    <span className="nav-dropdown-kicker">TheToolsMate</span>
                     <strong>{menu.label} Tools</strong>
                   </div>
                   <Link href={`/${name}`} onClick={() => setActiveMenu(null)}>View all →</Link>

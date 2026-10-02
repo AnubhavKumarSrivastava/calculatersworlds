@@ -35,7 +35,7 @@ export default function SiteFooter() {
           ))}
         </div>
         <div style={{ marginTop: 38, paddingTop: 18, borderTop: "1px solid #eef2f6", display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap", fontSize: 12 }}>
-          <span style={{ color: "#98a2b3" }}>© {new Date().getFullYear()} CalcIndia. All rights reserved.</span>
+          <span style={{ color: "#98a2b3" }}>© {new Date().getFullYear()} TheToolsMate. All rights reserved.</span>
           <div style={{ display: "flex", gap: 18 }}>
             <Link href="/about" style={{ textDecoration: "none" }}>About</Link>
             <Link href="/calculators" style={{ textDecoration: "none" }}>Calculators</Link>

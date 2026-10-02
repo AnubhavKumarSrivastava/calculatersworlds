@@ -19,7 +19,7 @@ export default function Home() {
     <div>
       <section className="container" style={{ padding: "72px 0 45px" }}>
         <div className="glass" style={{ position: "relative", overflow: "hidden", borderRadius: 30, padding: "72px 34px 48px", textAlign: "center" }}>
-          <div className="hero-badge" style={{ margin: "0 auto" }}>CALCINDIA · SMART DIGITAL TOOLS</div>
+          <div className="hero-badge" style={{ margin: "0 auto" }}>TheToolsMate · SMART DIGITAL TOOLS</div>
           <h1 style={{ maxWidth: 900, margin: "26px auto 0", color: "#172033", fontSize: "clamp(48px, 7vw, 86px)", lineHeight: .98, letterSpacing: "-.065em", fontWeight: 950 }}>
             Serious tools for everyday <span style={{ color: "#2563eb" }}>decisions.</span>
           </h1>

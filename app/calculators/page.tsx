@@ -68,7 +68,7 @@ export default function CalculatorsPage() {
 
         <section className="mt-20">
           <h2 className="text-2xl font-black text-[#172033]">
-            Explore More CalcIndia Tools
+            Explore More TheToolsMate Tools
           </h2>
 
           <div className="mt-6 flex flex-wrap gap-3">

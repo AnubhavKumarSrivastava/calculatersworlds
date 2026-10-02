@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   ),
 
   title: {
-    default: "CalcIndia — Smart Calculators & Tools",
-    template: "%s | CalcIndia",
+    default: "TheToolsMate — Smart Calculators & Tools",
+    template: "%s | TheToolsMate",
   },
 
   description:
