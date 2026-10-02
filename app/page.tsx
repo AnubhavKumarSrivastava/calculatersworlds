@@ -32,7 +32,7 @@ export default function Home() {
           </div>
           <div style={{ maxWidth: 620, margin: "42px auto 0", display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
             {[['51+','Tools'],['5','Categories'],['100%','Browser-first']].map(([value,label]) => (
-              <div key={label} style={{ padding: 16, border: "1px solid #e5eaf1", borderRadius: 16, background: "rgba(255,255,255,.85)" }}>
+              <div key={label} style={{ padding: 6, border: "1px solid #e5eaf1", borderRadius: 16, background: "rgba(255,255,255,.85)" }}>
                 <b style={{ display: "block", fontSize: 28, color: "#172033" }}>{value}</b>
                 <small style={{ color: "#98a2b3", textTransform: "uppercase", letterSpacing: ".12em" }}>{label}</small>
               </div>
